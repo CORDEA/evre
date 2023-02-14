@@ -15,7 +15,7 @@
         <ApplicationTitle>evre</ApplicationTitle>
 
         <!-- App Identifier -->
-        <ApplicationId>com.companyname.evre</ApplicationId>
+        <ApplicationId>jp.cordea.evre</ApplicationId>
         <ApplicationIdGuid>ae7ed8d9-4343-4d48-aad8-eff3a461561e</ApplicationIdGuid>
 
         <!-- Versions -->
