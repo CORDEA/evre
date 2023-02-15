@@ -17,4 +17,11 @@ namespace evre;
 )]
 public class MainActivity : MauiAppCompatActivity
 {
+    protected override void OnCreate(Bundle savedInstanceState)
+    {
+        base.OnCreate(savedInstanceState);
+        var rawUri = Intent?.Data?.ToString();
+        if (rawUri == null) return;
+        LaunchUriHandler.TryHandle(new Uri(rawUri));
+    }
 }

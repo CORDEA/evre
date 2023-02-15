@@ -13,6 +13,6 @@ public class AppDelegate : MauiUIApplicationDelegate
 
     public override bool OpenUrl(UIApplication application, NSUrl url, NSDictionary options)
     {
-        return true;
+        return url.AbsoluteString != null && LaunchUriHandler.TryHandle(new Uri(url.AbsoluteString));
     }
 }
