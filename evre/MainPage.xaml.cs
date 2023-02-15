@@ -33,14 +33,22 @@ public partial class MainPage : ContentPage
 
     private class CodeReceiver : ICodeReceiver
     {
-        // https://developers.google.com/identity/protocols/oauth2/native-app?hl=en
-        public string RedirectUri => "jp.cordea.evre:oauth2/redirect";
+        public string RedirectUri => new LaunchUriBuilder(LaunchType.OAuth2Redirect).Build().AbsoluteUri;
 
         public async Task<AuthorizationCodeResponseUrl> ReceiveCodeAsync(AuthorizationCodeRequestUrl url,
             CancellationToken taskCancellationToken)
         {
-            await Browser.OpenAsync(url.Build().AbsoluteUri, BrowserLaunchMode.External);
-            throw new NotImplementedException();
+            await Launcher.Default.OpenAsync(url.Build().AbsoluteUri);
+            var result = await LaunchUriHandler.LaunchResult;
+            if (result.Type != LaunchType.OAuth2Redirect) throw new OperationCanceledException();
+            return new AuthorizationCodeResponseUrl
+            {
+                Code = result.Query.Get("code"),
+                State = result.Query.Get("state"),
+                Error = result.Query.Get("error"),
+                ErrorDescription = result.Query.Get("error_description"),
+                ErrorUri = result.Query.Get("error_uri")
+            };
         }
     }
 }
