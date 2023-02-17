@@ -1,4 +1,5 @@
-﻿using Google.Apis.Auth.OAuth2;
+﻿using System.ComponentModel;
+using Google.Apis.Auth.OAuth2;
 using Google.Apis.Auth.OAuth2.Requests;
 using Google.Apis.Auth.OAuth2.Responses;
 using Google.Apis.Calendar.v3;
@@ -6,13 +7,36 @@ using Google.Apis.Services;
 
 namespace evre;
 
-public partial class MainPage : ContentPage
+public partial class MainPage : ContentPage, INotifyPropertyChanged
 {
     private CalendarService _calendarService;
+    private string _description = "";
+    private string _name = "";
 
     public MainPage()
     {
         InitializeComponent();
+        BindingContext = this;
+    }
+
+    public string Name
+    {
+        get => _name;
+        set
+        {
+            _name = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string Description
+    {
+        get => _description;
+        set
+        {
+            _description = value;
+            OnPropertyChanged();
+        }
     }
 
     private async void OnLoginClicked(object sender, EventArgs e)

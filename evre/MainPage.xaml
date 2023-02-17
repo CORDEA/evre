@@ -4,12 +4,23 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="evre.MainPage">
 
-    <Grid VerticalOptions="Fill">
+    <Grid VerticalOptions="Fill" Padding="16">
+        <VerticalStackLayout>
+            <Editor
+                Placeholder="Event name"
+                Text="{Binding Name}" />
+
+            <Editor
+                Placeholder="Event description"
+                Text="{Binding Description}" />
+        </VerticalStackLayout>
+
         <Button
-            x:Name="LoginButton"
-            Text="Login"
-            Margin="16,0,16,24"
-            VerticalOptions="End"
+            Text="Start"
+            HeightRequest="128"
+            HorizontalOptions="Fill"
+            Margin="16,0,16,0"
+            VerticalOptions="Center"
             Clicked="OnLoginClicked" />
     </Grid>
 </ContentPage>
