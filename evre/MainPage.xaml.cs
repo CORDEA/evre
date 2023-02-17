@@ -3,6 +3,7 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Auth.OAuth2.Requests;
 using Google.Apis.Auth.OAuth2.Responses;
 using Google.Apis.Calendar.v3;
+using Google.Apis.Calendar.v3.Data;
 using Google.Apis.Services;
 
 namespace evre;
@@ -41,7 +42,23 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 
     private async void OnLoginClicked(object sender, EventArgs e)
     {
+        if (string.IsNullOrWhiteSpace(Name)) return;
         _calendarService ??= await Authorize();
+        var now = DateTime.Now;
+        var ev = new Event
+        {
+            Summary = Name,
+            Description = Description,
+            Start = new EventDateTime
+            {
+                DateTime = now
+            },
+            End = new EventDateTime
+            {
+                DateTime = now.Add(TimeSpan.FromMinutes(10))
+            }
+        };
+        await _calendarService.Events.Insert(ev, "primary").ExecuteAsync();
     }
 
     private async Task<CalendarService> Authorize()
