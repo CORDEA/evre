@@ -19,6 +19,8 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
 
+        builder.Services.AddTransient<MainPage>();
+        builder.Services.AddSingleton<Authorizer>();
         return builder.Build();
     }
 }

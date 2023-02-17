@@ -1,21 +1,19 @@
 ﻿using System.ComponentModel;
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.Auth.OAuth2.Requests;
-using Google.Apis.Auth.OAuth2.Responses;
+using Google;
 using Google.Apis.Calendar.v3;
 using Google.Apis.Calendar.v3.Data;
-using Google.Apis.Services;
 
 namespace evre;
 
 public partial class MainPage : ContentPage, INotifyPropertyChanged
 {
-    private CalendarService _calendarService;
+    private readonly Authorizer _authorizer;
     private string _description = "";
     private string _name = "";
 
-    public MainPage()
+    public MainPage(Authorizer authorizer)
     {
+        _authorizer = authorizer;
         InitializeComponent();
         BindingContext = this;
     }
@@ -43,7 +41,18 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
     private async void OnLoginClicked(object sender, EventArgs e)
     {
         if (string.IsNullOrWhiteSpace(Name)) return;
-        _calendarService ??= await Authorize();
+        if (_authorizer.Initializer == null)
+        {
+            try
+            {
+                await _authorizer.Authorize();
+            }
+            catch (Exception exception)
+            {
+                // TODO
+                return;
+            }
+        }
         var now = DateTime.Now;
         var ev = new Event
         {
@@ -58,51 +67,15 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
                 DateTime = now.Add(TimeSpan.FromMinutes(10))
             }
         };
-        await _calendarService.Events.Insert(ev, "primary").ExecuteAsync();
-    }
-
-    private async Task<CalendarService> Authorize()
-    {
-        var platform = DeviceInfo.Current.Platform;
-        var name = platform == DevicePlatform.Android
-            ? "client_secret.android.txt"
-            : "client_secret.ios.txt";
-        await using var stream = await FileSystem.OpenAppPackageFileAsync(name);
-        using var reader = new StreamReader(stream);
-        var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-            new ClientSecrets
-            {
-                ClientId = await reader.ReadLineAsync()
-            },
-            new[] { CalendarService.Scope.CalendarEvents },
-            "user",
-            CancellationToken.None,
-            codeReceiver: new CodeReceiver()
-        );
-        return new CalendarService(new BaseClientService.Initializer
+        var service = new CalendarService(_authorizer.Initializer);
+        Event response;
+        try
         {
-            HttpClientInitializer = credential
-        });
-    }
-
-    private class CodeReceiver : ICodeReceiver
-    {
-        public string RedirectUri => new LaunchUriBuilder(LaunchType.OAuth2Redirect).Build().AbsoluteUri;
-
-        public async Task<AuthorizationCodeResponseUrl> ReceiveCodeAsync(AuthorizationCodeRequestUrl url,
-            CancellationToken taskCancellationToken)
+            response = await service.Events.Insert(ev, "primary").ExecuteAsync();
+        }
+        catch (GoogleApiException exception)
         {
-            await Launcher.Default.OpenAsync(url.Build().AbsoluteUri);
-            var result = await LaunchUriHandler.LaunchResult;
-            if (result.Type != LaunchType.OAuth2Redirect) throw new OperationCanceledException();
-            return new AuthorizationCodeResponseUrl
-            {
-                Code = result.Query.Get("code"),
-                State = result.Query.Get("state"),
-                Error = result.Query.Get("error"),
-                ErrorDescription = result.Query.Get("error_description"),
-                ErrorUri = result.Query.Get("error_uri")
-            };
+            // TODO
         }
     }
 }
