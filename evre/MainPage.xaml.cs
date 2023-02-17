@@ -2,11 +2,14 @@
 using Google.Apis.Auth.OAuth2.Requests;
 using Google.Apis.Auth.OAuth2.Responses;
 using Google.Apis.Calendar.v3;
+using Google.Apis.Services;
 
 namespace evre;
 
 public partial class MainPage : ContentPage
 {
+    private CalendarService _calendarService;
+
     public MainPage()
     {
         InitializeComponent();
@@ -14,7 +17,13 @@ public partial class MainPage : ContentPage
 
     private async void OnLoginClicked(object sender, EventArgs e)
     {
-        var name = DeviceInfo.Current.Platform == DevicePlatform.Android
+        _calendarService ??= await Authorize();
+    }
+
+    private async Task<CalendarService> Authorize()
+    {
+        var platform = DeviceInfo.Current.Platform;
+        var name = platform == DevicePlatform.Android
             ? "client_secret.android.txt"
             : "client_secret.ios.txt";
         await using var stream = await FileSystem.OpenAppPackageFileAsync(name);
@@ -29,6 +38,10 @@ public partial class MainPage : ContentPage
             CancellationToken.None,
             codeReceiver: new CodeReceiver()
         );
+        return new CalendarService(new BaseClientService.Initializer
+        {
+            HttpClientInitializer = credential
+        });
     }
 
     private class CodeReceiver : ICodeReceiver
