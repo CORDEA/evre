@@ -21,6 +21,8 @@ public static class MauiProgram
 
         builder.Services.AddTransient<MainPage>();
         builder.Services.AddSingleton<Authorizer>();
+        builder.Services.AddSingleton<EventRepository>();
+        builder.Services.AddSingleton<OngoingEventRepository>();
         return builder.Build();
     }
 }
