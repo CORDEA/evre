@@ -3,7 +3,6 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="evre.MainPage">
-
     <Grid VerticalOptions="Fill" Padding="16">
         <VerticalStackLayout>
             <Editor
@@ -21,6 +20,6 @@
             HorizontalOptions="Fill"
             Margin="16,0,16,0"
             VerticalOptions="Center"
-            Clicked="OnLoginClicked" />
+            Command="{Binding AddEventCommand}" />
     </Grid>
 </ContentPage>

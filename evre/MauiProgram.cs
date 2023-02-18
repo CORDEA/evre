@@ -19,10 +19,15 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
 
-        builder.Services.AddTransient<MainPage>();
         builder.Services.AddSingleton<Authorizer>();
+
         builder.Services.AddSingleton<EventRepository>();
         builder.Services.AddSingleton<OngoingEventRepository>();
+
+        builder.Services.AddTransient<MainViewModel>();
+
+        builder.Services.AddTransient<MainPage>();
+
         return builder.Build();
     }
 }
