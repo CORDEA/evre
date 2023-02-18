@@ -12,6 +12,7 @@ public class Authorizer
 
     public async Task Authorize()
     {
+        if (Initializer != null) return;
         var platform = DeviceInfo.Current.Platform;
         var name = platform == DevicePlatform.Android
             ? "client_secret.android.txt"

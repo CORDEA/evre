@@ -15,7 +15,7 @@
         </VerticalStackLayout>
 
         <Button
-            Text="Start"
+            Text="{Binding ButtonText}"
             HeightRequest="128"
             HorizontalOptions="Fill"
             Margin="16,0,16,0"
