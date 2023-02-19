@@ -15,7 +15,7 @@ public class MainViewModel : INotifyPropertyChanged
     private string _description = "";
     private bool _isRemoveButtonVisible;
     private string _name = "";
-    private string _updateButtonText = "";
+    private UpdateButtonText _updateButtonText = UpdateButtonText.Start;
 
     public MainViewModel(Authorizer authorizer,
         HasOngoingEventUseCase hasOngoingEventUseCase,
@@ -28,10 +28,9 @@ public class MainViewModel : INotifyPropertyChanged
         _startEventUseCase = registerEventUseCase;
         _stopEventUseCase = updateOngoingEventUseCase;
         _removeOngoingEventUseCase = removeOngoingEventUseCase;
-        var hasOngoingEvent = _hasOngoingEventUseCase.Execute();
-        UpdateButtonText = hasOngoingEvent ? "Stop" : "Start";
-        IsRemoveButtonVisible = hasOngoingEvent;
+        UpdateButtonState(_hasOngoingEventUseCase.Execute());
     }
+
 
     public ICommand UpdateEventCommand => new Command(UpdateEvent);
     public ICommand RemoveEventCommand => new Command(RemoveEvent);
@@ -48,7 +47,7 @@ public class MainViewModel : INotifyPropertyChanged
         set => SetField(ref _description, value);
     }
 
-    public string UpdateButtonText
+    public UpdateButtonText UpdateButtonText
     {
         get => _updateButtonText;
         private set => SetField(ref _updateButtonText, value);
@@ -79,8 +78,7 @@ public class MainViewModel : INotifyPropertyChanged
                 return;
             }
 
-            UpdateButtonText = "Start";
-            IsRemoveButtonVisible = false;
+            UpdateButtonState(false);
             return;
         }
 
@@ -95,8 +93,7 @@ public class MainViewModel : INotifyPropertyChanged
             return;
         }
 
-        IsRemoveButtonVisible = true;
-        UpdateButtonText = "Stop";
+        UpdateButtonState(true);
     }
 
     private async void RemoveEvent()
@@ -112,8 +109,13 @@ public class MainViewModel : INotifyPropertyChanged
             return;
         }
 
-        UpdateButtonText = "Start";
-        IsRemoveButtonVisible = false;
+        UpdateButtonState(false);
+    }
+
+    private void UpdateButtonState(bool hasOngoingEvent)
+    {
+        UpdateButtonText = hasOngoingEvent ? UpdateButtonText.Stop : UpdateButtonText.Start;
+        IsRemoveButtonVisible = hasOngoingEvent;
     }
 
     private void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -128,4 +130,10 @@ public class MainViewModel : INotifyPropertyChanged
         OnPropertyChanged(propertyName);
         return true;
     }
+}
+
+public enum UpdateButtonText
+{
+    Start,
+    Stop
 }
