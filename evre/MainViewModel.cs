@@ -9,25 +9,32 @@ public class MainViewModel : INotifyPropertyChanged
 {
     private readonly Authorizer _authorizer;
     private readonly HasOngoingEventUseCase _hasOngoingEventUseCase;
+    private readonly RemoveOngoingEventUseCase _removeOngoingEventUseCase;
     private readonly StartEventUseCase _startEventUseCase;
     private readonly StopEventUseCase _stopEventUseCase;
-    private string _buttonText = "";
     private string _description = "";
+    private bool _isRemoveButtonVisible;
     private string _name = "";
+    private string _updateButtonText = "";
 
     public MainViewModel(Authorizer authorizer,
         HasOngoingEventUseCase hasOngoingEventUseCase,
         StartEventUseCase registerEventUseCase,
-        StopEventUseCase updateOngoingEventUseCase)
+        StopEventUseCase updateOngoingEventUseCase,
+        RemoveOngoingEventUseCase removeOngoingEventUseCase)
     {
         _authorizer = authorizer;
         _hasOngoingEventUseCase = hasOngoingEventUseCase;
         _startEventUseCase = registerEventUseCase;
         _stopEventUseCase = updateOngoingEventUseCase;
-        ButtonText = _hasOngoingEventUseCase.Execute() ? "Stop" : "Start";
+        _removeOngoingEventUseCase = removeOngoingEventUseCase;
+        var hasOngoingEvent = _hasOngoingEventUseCase.Execute();
+        UpdateButtonText = hasOngoingEvent ? "Stop" : "Start";
+        IsRemoveButtonVisible = hasOngoingEvent;
     }
 
-    public ICommand AddEventCommand => new Command(RegisterEvent);
+    public ICommand UpdateEventCommand => new Command(UpdateEvent);
+    public ICommand RemoveEventCommand => new Command(RemoveEvent);
 
     public string Name
     {
@@ -41,16 +48,22 @@ public class MainViewModel : INotifyPropertyChanged
         set => SetField(ref _description, value);
     }
 
-    public string ButtonText
+    public string UpdateButtonText
     {
-        get => _buttonText;
-        private set => SetField(ref _buttonText, value);
+        get => _updateButtonText;
+        private set => SetField(ref _updateButtonText, value);
+    }
+
+    public bool IsRemoveButtonVisible
+    {
+        get => _isRemoveButtonVisible;
+        private set => SetField(ref _isRemoveButtonVisible, value);
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
 
 
-    private async void RegisterEvent()
+    private async void UpdateEvent()
     {
         await _authorizer.Authorize();
         var now = DateTime.Now;
@@ -66,7 +79,8 @@ public class MainViewModel : INotifyPropertyChanged
                 return;
             }
 
-            ButtonText = "Start";
+            UpdateButtonText = "Start";
+            IsRemoveButtonVisible = false;
             return;
         }
 
@@ -81,7 +95,25 @@ public class MainViewModel : INotifyPropertyChanged
             return;
         }
 
-        ButtonText = "Stop";
+        IsRemoveButtonVisible = true;
+        UpdateButtonText = "Stop";
+    }
+
+    private async void RemoveEvent()
+    {
+        await _authorizer.Authorize();
+        try
+        {
+            await _removeOngoingEventUseCase.Execute();
+        }
+        catch (GoogleApiException e)
+        {
+            // TODO
+            return;
+        }
+
+        UpdateButtonText = "Start";
+        IsRemoveButtonVisible = false;
     }
 
     private void OnPropertyChanged([CallerMemberName] string propertyName = null)

@@ -27,6 +27,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<HasOngoingEventUseCase>();
         builder.Services.AddSingleton<StartEventUseCase>();
         builder.Services.AddSingleton<StopEventUseCase>();
+        builder.Services.AddSingleton<RemoveOngoingEventUseCase>();
 
         builder.Services.AddTransient<MainViewModel>();
 

@@ -14,12 +14,20 @@
                 Text="{Binding Description}" />
         </VerticalStackLayout>
 
-        <Button
-            Text="{Binding ButtonText}"
-            HeightRequest="128"
-            HorizontalOptions="Fill"
+        <VerticalStackLayout
             Margin="16,0,16,0"
-            VerticalOptions="Center"
-            Command="{Binding AddEventCommand}" />
+            Spacing="16"
+            VerticalOptions="Center">
+            <Button
+                Text="{Binding UpdateButtonText}"
+                HeightRequest="128"
+                Command="{Binding UpdateEventCommand}" />
+
+            <Button
+                Text="Remove"
+                HeightRequest="64"
+                IsVisible="{Binding IsRemoveButtonVisible}"
+                Command="{Binding RemoveEventCommand}" />
+        </VerticalStackLayout>
     </Grid>
 </ContentPage>

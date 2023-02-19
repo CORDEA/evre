@@ -25,4 +25,9 @@ public class EventRepository
     {
         await Service.Events.Update(e, CalendarId, eventId).ExecuteAsync();
     }
+
+    public async Task Delete(string eventId)
+    {
+        await Service.Events.Delete(CalendarId, eventId).ExecuteAsync();
+    }
 }
