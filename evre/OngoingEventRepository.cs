@@ -13,4 +13,9 @@ public class OngoingEventRepository
     {
         Preferences.Default.Set(OngoingEventKey, id);
     }
+
+    public void Remove()
+    {
+        Preferences.Default.Remove(OngoingEventKey);
+    }
 }

@@ -11,6 +11,7 @@ public class MainViewModel : INotifyPropertyChanged
     private readonly Authorizer _authorizer;
     private readonly HasOngoingEventUseCase _hasOngoingEventUseCase;
     private readonly RegisterEventUseCase _registerEventUseCase;
+    private readonly RemoveEventCacheUseCase _removeEventCacheUseCase;
     private readonly UpdateOngoingEventUseCase _updateOngoingEventUseCase;
     private string _buttonText = "";
     private string _description = "";
@@ -19,12 +20,14 @@ public class MainViewModel : INotifyPropertyChanged
     public MainViewModel(Authorizer authorizer,
         HasOngoingEventUseCase hasOngoingEventUseCase,
         RegisterEventUseCase registerEventUseCase,
-        UpdateOngoingEventUseCase updateOngoingEventUseCase)
+        UpdateOngoingEventUseCase updateOngoingEventUseCase,
+        RemoveEventCacheUseCase removeEventCacheUseCase)
     {
         _authorizer = authorizer;
         _hasOngoingEventUseCase = hasOngoingEventUseCase;
         _registerEventUseCase = registerEventUseCase;
         _updateOngoingEventUseCase = updateOngoingEventUseCase;
+        _removeEventCacheUseCase = removeEventCacheUseCase;
         ButtonText = _hasOngoingEventUseCase.Execute() ? "Stop" : "Start";
     }
 
@@ -74,6 +77,8 @@ public class MainViewModel : INotifyPropertyChanged
                 // TODO
                 return;
             }
+
+            _removeEventCacheUseCase.Execute();
 
             ButtonText = "Start";
             return;
