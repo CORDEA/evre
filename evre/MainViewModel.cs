@@ -2,7 +2,6 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Google;
-using Google.Apis.Calendar.v3.Data;
 
 namespace evre;
 
@@ -10,24 +9,21 @@ public class MainViewModel : INotifyPropertyChanged
 {
     private readonly Authorizer _authorizer;
     private readonly HasOngoingEventUseCase _hasOngoingEventUseCase;
-    private readonly RegisterEventUseCase _registerEventUseCase;
-    private readonly RemoveEventCacheUseCase _removeEventCacheUseCase;
-    private readonly UpdateOngoingEventUseCase _updateOngoingEventUseCase;
+    private readonly StartEventUseCase _startEventUseCase;
+    private readonly StopEventUseCase _stopEventUseCase;
     private string _buttonText = "";
     private string _description = "";
     private string _name = "";
 
     public MainViewModel(Authorizer authorizer,
         HasOngoingEventUseCase hasOngoingEventUseCase,
-        RegisterEventUseCase registerEventUseCase,
-        UpdateOngoingEventUseCase updateOngoingEventUseCase,
-        RemoveEventCacheUseCase removeEventCacheUseCase)
+        StartEventUseCase registerEventUseCase,
+        StopEventUseCase updateOngoingEventUseCase)
     {
         _authorizer = authorizer;
         _hasOngoingEventUseCase = hasOngoingEventUseCase;
-        _registerEventUseCase = registerEventUseCase;
-        _updateOngoingEventUseCase = updateOngoingEventUseCase;
-        _removeEventCacheUseCase = removeEventCacheUseCase;
+        _startEventUseCase = registerEventUseCase;
+        _stopEventUseCase = updateOngoingEventUseCase;
         ButtonText = _hasOngoingEventUseCase.Execute() ? "Stop" : "Start";
     }
 
@@ -62,23 +58,13 @@ public class MainViewModel : INotifyPropertyChanged
         {
             try
             {
-                await _updateOngoingEventUseCase.Execute(
-                    new Event
-                    {
-                        End = new EventDateTime
-                        {
-                            DateTime = now
-                        }
-                    }
-                );
+                await _stopEventUseCase.Execute(now);
             }
             catch (GoogleApiException e)
             {
                 // TODO
                 return;
             }
-
-            _removeEventCacheUseCase.Execute();
 
             ButtonText = "Start";
             return;
@@ -87,21 +73,7 @@ public class MainViewModel : INotifyPropertyChanged
         if (string.IsNullOrWhiteSpace(Name)) return;
         try
         {
-            await _registerEventUseCase.Execute(
-                new Event
-                {
-                    Summary = Name,
-                    Description = Description,
-                    Start = new EventDateTime
-                    {
-                        DateTime = now
-                    },
-                    End = new EventDateTime
-                    {
-                        DateTime = now.Add(TimeSpan.FromMinutes(10))
-                    }
-                }
-            );
+            await _startEventUseCase.Execute(Name, Description, now);
         }
         catch (GoogleApiException e)
         {
