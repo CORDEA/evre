@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using CommunityToolkit.Maui.Alerts;
 using Google;
 
 namespace evre;
@@ -31,7 +32,6 @@ public class MainViewModel : INotifyPropertyChanged
         UpdateButtonState(_hasOngoingEventUseCase.Execute());
     }
 
-
     public ICommand UpdateEventCommand => new Command(UpdateEvent);
     public ICommand RemoveEventCommand => new Command(RemoveEvent);
 
@@ -59,6 +59,7 @@ public class MainViewModel : INotifyPropertyChanged
         private set => SetField(ref _isRemoveButtonVisible, value);
     }
 
+
     public event PropertyChangedEventHandler PropertyChanged;
 
 
@@ -74,11 +75,12 @@ public class MainViewModel : INotifyPropertyChanged
             }
             catch (GoogleApiException e)
             {
-                // TODO
+                await Toast.Make(e.Message).Show();
                 return;
             }
 
             UpdateButtonState(false);
+            await Toast.Make("The event has been updated.").Show();
             return;
         }
 
@@ -89,11 +91,12 @@ public class MainViewModel : INotifyPropertyChanged
         }
         catch (GoogleApiException e)
         {
-            // TODO
+            await Toast.Make(e.Message).Show();
             return;
         }
 
         UpdateButtonState(true);
+        await Toast.Make("The event has been updated.").Show();
     }
 
     private async void RemoveEvent()
@@ -105,11 +108,12 @@ public class MainViewModel : INotifyPropertyChanged
         }
         catch (GoogleApiException e)
         {
-            // TODO
+            await Toast.Make(e.Message).Show();
             return;
         }
 
         UpdateButtonState(false);
+        await Toast.Make("The event has been removed.").Show();
     }
 
     private void UpdateButtonState(bool hasOngoingEvent)
