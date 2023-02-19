@@ -16,6 +16,11 @@ public class EventRepository
 
     private CalendarService Service => new(_authorizer.Initializer);
 
+    public Task<Event> Find(string eventId)
+    {
+        return Service.Events.Get(CalendarId, eventId).ExecuteAsync();
+    }
+
     public Task<Event> Insert(Event e)
     {
         return Service.Events.Insert(e, CalendarId).ExecuteAsync();

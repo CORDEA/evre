@@ -17,12 +17,10 @@ public class StopEventUseCase
     {
         var id = _ongoingEventRepository.Find();
         if (string.IsNullOrWhiteSpace(id)) throw new InvalidOperationException();
-        var e = new Event
+        var e = await _eventRepository.Find(id);
+        e.End = new EventDateTime
         {
-            End = new EventDateTime
-            {
-                DateTime = endAt
-            }
+            DateTime = endAt
         };
         await _eventRepository.Update(e, id);
         _ongoingEventRepository.Remove();
